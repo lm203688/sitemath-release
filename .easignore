@@ -1,0 +1,9 @@
+node_modules/
+.expo/
+dist/
+build/
+_export/
+*.log
+测试/
+上架包/
+.github/
