@@ -52,7 +52,7 @@ jobs:
           xcodebuild build \
             -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
-            -configuration Debug \
+            -configuration Release \
             -sdk iphonesimulator \
             -destination "platform=iOS Simulator,id=$UDID" \
             -derivedDataPath "$RUNNER_TEMP/dd" \
@@ -62,7 +62,7 @@ jobs:
       - name: Install and launch on Duo
         run: |
           set -x
-          APP=$(find "$RUNNER_TEMP/dd/Build/Products" -maxdepth 2 -name "*.app" | head -1)
+          APP=$(find "$RUNNER_TEMP/dd/Build/Products/Release-iphonesimulator" -maxdepth 1 -name "*.app" | head -1)
           echo "APP=$APP"
           xcrun simctl install "$UDID" "$APP"
           (xcrun simctl launch --console-pty "$UDID" "$BUNDLE_ID" > "$RUNNER_TEMP/app.log" 2>&1 &)
@@ -89,3 +89,4 @@ jobs:
           name: duo-check-shots
           path: out
           if-no-files-found: warn
+
