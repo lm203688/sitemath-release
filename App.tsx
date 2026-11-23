@@ -11,6 +11,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as D from './src/domain';
+import FeedbackModal from './src/FeedbackModal';
 import { GROUPS, TOOLS, encodeValue, parseFieldValue, toolById, type Field, type Tool, type Units } from './src/tools';
 
 type Screen = { kind: 'list' } | { kind: 'tool'; id: string } | { kind: 'job' };
@@ -198,6 +199,7 @@ function ListScreen(props: {
   onJob: () => void;
 }) {
   const { tools, units, onToggleUnits, onOpen, job, onJob } = props;
+  const [fbOpen, setFbOpen] = useState(false);
   return (
     <View style={S.root}>
       <StatusBar style="dark" />
@@ -236,8 +238,12 @@ function ListScreen(props: {
         <Text style={S.footerNote}>
           {D.REFERENCE_DISCLAIMER}
         </Text>
+        <Pressable onPress={() => setFbOpen(true)} style={{ paddingVertical: 14 }}>
+          <Text style={{ fontSize: 13, fontWeight: '600', color: '#2F6F4F' }}>Send feedback</Text>
+        </Pressable>
       </ScrollView>
       <JobBar job={job} onPress={onJob} />
+      <FeedbackModal visible={fbOpen} onClose={() => setFbOpen(false)} context="list" />
     </View>
   );
 }
