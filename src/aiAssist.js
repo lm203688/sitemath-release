@@ -122,7 +122,9 @@ export default function AiAssist(props) {
               </Pressable>
             </View>
             <Text style={styles.sub}>
-              {state.available
+              {state.available && state.backend === 'pcc'
+                ? 'On-device model is off, so answers come from Apple Private Cloud Compute. No account, no training on your data.'
+                : state.available
                 ? 'Runs on device with Apple Intelligence. Nothing leaves your phone.'
                 : reasonText(state.reason)}
             </Text>
