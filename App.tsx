@@ -13,6 +13,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as D from './src/domain';
 import FeedbackModal from './src/FeedbackModal';
 import { GROUPS, TOOLS, encodeValue, parseFieldValue, toolById, type Field, type Tool, type Units } from './src/tools';
+import { CardGrid, DuoPanes, bodyPad, headerPad, useDuo } from './src/duo';
 
 type Screen = { kind: 'list' } | { kind: 'tool'; id: string } | { kind: 'job' };
 
@@ -144,10 +145,23 @@ export default function App() {
 
   const total = useMemo(() => D.jobTotal(job), [job]);
 
+  // Duo / iPad: keep the catalogue visible while a calculator (or the job takeoff) is open.
+  const duo = useDuo();
+  const listPane = (
+    <ListScreen
+      tools={TOOLS}
+      units={units}
+      onToggleUnits={toggleUnits}
+      onOpen={(id) => setScreen({ kind: 'tool', id })}
+      job={job}
+      onJob={() => setScreen({ kind: 'job' })}
+    />
+  );
+
   if (screen.kind === 'tool') {
     const tool = toolById(screen.id);
-    if (!tool) return <ListScreen tools={TOOLS} units={units} onToggleUnits={toggleUnits} onOpen={(id) => setScreen({ kind: 'tool', id })} job={job} onJob={() => setScreen({ kind: 'job' })} />;
-    return (
+    if (!tool) return listPane;
+    const detail = (
       <ToolScreen
         tool={tool}
         units={units}
@@ -160,10 +174,11 @@ export default function App() {
         onAdd={(items) => addToJob(tool, items)}
       />
     );
+    return duo.twoPane ? <DuoPanes layout={duo} left={listPane} right={detail} /> : detail;
   }
 
   if (screen.kind === 'job') {
-    return (
+    const detail = (
       <JobScreen
         job={job}
         total={total}
@@ -174,18 +189,10 @@ export default function App() {
         onBack={() => setScreen({ kind: 'list' })}
       />
     );
+    return duo.twoPane ? <DuoPanes layout={duo} left={listPane} right={detail} /> : detail;
   }
 
-  return (
-    <ListScreen
-      tools={TOOLS}
-      units={units}
-      onToggleUnits={toggleUnits}
-      onOpen={(id) => setScreen({ kind: 'tool', id })}
-      job={job}
-      onJob={() => setScreen({ kind: 'job' })}
-    />
-  );
+  return listPane;
 }
 
 // ——————————————————— 列表页 ———————————————————
@@ -200,10 +207,11 @@ function ListScreen(props: {
 }) {
   const { tools, units, onToggleUnits, onOpen, job, onJob } = props;
   const [fbOpen, setFbOpen] = useState(false);
+  const duo = useDuo();
   return (
     <View style={S.root}>
       <StatusBar style="dark" />
-      <View style={S.header}>
+      <View style={[S.header, headerPad(duo)]}>
         <View style={S.headerRow}>
           <View style={{ flex: 1 }}>
             <Text style={S.title}>SiteMath</Text>
@@ -212,26 +220,28 @@ function ListScreen(props: {
           <UnitSwitch units={units} onChange={onToggleUnits} />
         </View>
       </View>
-      <ScrollView contentContainerStyle={S.listBody}>
+      <ScrollView contentContainerStyle={[S.listBody, bodyPad(duo, 16)]}>
         {GROUPS.map((group) => {
           const items = tools.filter((t) => t.group === group);
           if (items.length === 0) return null;
           return (
             <View key={group} style={S.groupBlock}>
               <Text style={S.groupTitle}>{group.toUpperCase()}</Text>
-              {items.map((t) => (
-                <Pressable
-                  key={t.id}
-                  onPress={() => onOpen(t.id)}
-                  style={({ pressed }) => [S.toolRow, pressed && S.pressed]}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text style={S.toolName}>{t.name}</Text>
-                    <Text style={S.toolBlurb}>{t.blurb}</Text>
-                  </View>
-                  <Text style={S.chev}>›</Text>
-                </Pressable>
-              ))}
+              <CardGrid layout={duo}>
+                {items.map((t) => (
+                  <Pressable
+                    key={t.id}
+                    onPress={() => onOpen(t.id)}
+                    style={({ pressed }) => [S.toolRow, pressed && S.pressed]}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={S.toolName}>{t.name}</Text>
+                      <Text style={S.toolBlurb}>{t.blurb}</Text>
+                    </View>
+                    <Text style={S.chev}>›</Text>
+                  </Pressable>
+                ))}
+              </CardGrid>
             </View>
           );
         })}
@@ -270,10 +280,11 @@ function UnitSwitch(props: { units: Units; onChange: (u: Units) => void }) {
 
 function JobBar(props: { job: D.JobLine[]; onPress: () => void }) {
   const { job, onPress } = props;
+  const duo = useDuo();
   const total = D.jobTotal(job);
   const hasPrice = job.some((l) => l.unitPrice != null);
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [S.jobBar, pressed && S.pressed]}>
+    <Pressable onPress={onPress} style={({ pressed }) => [S.jobBar, { marginRight: 16 + duo.gutter }, pressed && S.pressed]}>
       <View style={{ flex: 1 }}>
         <Text style={S.jobBarTitle}>Job takeoff</Text>
         <Text style={S.jobBarSub}>
@@ -299,6 +310,7 @@ function ToolScreen(props: {
   onAdd: (items: { label: string; qty: number; unit: string }[]) => void;
 }) {
   const { tool, units, textFor, onChange, choiceFor, onChoice, onReset, onBack, onAdd } = props;
+  const duo = useDuo();
 
   const numbers = useMemo(() => {
     const n: Record<string, number> = {};
@@ -325,7 +337,7 @@ function ToolScreen(props: {
   return (
     <View style={S.root}>
       <StatusBar style="dark" />
-      <View style={S.header}>
+      <View style={[S.header, headerPad(duo)]}>
         <Pressable onPress={onBack} style={S.backBtn} hitSlop={12}>
           <Text style={S.backText}>‹ Back</Text>
         </Pressable>
@@ -338,7 +350,7 @@ function ToolScreen(props: {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={S.body} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[S.body, bodyPad(duo, 16)]} keyboardShouldPersistTaps="handled">
         {tool.fields.map((f) => (
           <View key={f.key} style={S.fieldRow}>
             <Text style={S.fieldLabel}>{f.label}</Text>
@@ -423,12 +435,13 @@ function JobScreen(props: {
   onBack: () => void;
 }) {
   const { job, total, onPrice, onRemove, onClear, onShare, onBack } = props;
+  const duo = useDuo();
   const hasPrice = job.some((l) => l.unitPrice != null);
 
   return (
     <View style={S.root}>
       <StatusBar style="dark" />
-      <View style={S.header}>
+      <View style={[S.header, headerPad(duo)]}>
         <Pressable onPress={onBack} style={S.backBtn} hitSlop={12}>
           <Text style={S.backText}>‹ Back</Text>
         </Pressable>
@@ -438,7 +451,7 @@ function JobScreen(props: {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={S.body} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={[S.body, bodyPad(duo, 16)]} keyboardShouldPersistTaps="handled">
         {job.length === 0 ? (
           <View style={S.emptyJob}>
             <Text style={S.emptyTitle}>Nothing here yet</Text>
