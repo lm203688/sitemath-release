@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "SiteMath",
+    "slug": "sitemath",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "description": "Material takeoff calculator for concrete, masonry, rebar, aggregate and finishes. Offline, no account, no ads.",
+    "ios": {
+      "bundleIdentifier": "com.lixing.sitemath",
+      "supportsTablet": false,
+      "deploymentTarget": "16.4",
+      "buildNumber": "2",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "privacyManifests": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "0A2A.1",
+              "3B52.1",
+              "C617.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryDiskSpace",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "E174.1",
+              "85F4.1"
+            ]
+          }
+        ]
+      },
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIRequiredDeviceCapabilities": [
+          "arm64"
+        ]
+      }
+    },
+    "plugins": [
+      "./plugins/withUIScene.cjs",
+      "expo-file-system"
+    ],
+    "owner": "lm203688",
+    "extra": {
+      "eas": {
+        "projectId": "55a441f7-4d2f-4ed5-a00d-4a8ebaaef9f6"
+      }
+    }
+  }
+}
