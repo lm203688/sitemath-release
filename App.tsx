@@ -14,6 +14,7 @@ import * as D from './src/domain';
 import FeedbackModal from './src/FeedbackModal';
 import { GROUPS, TOOLS, encodeValue, parseFieldValue, toolById, type Field, type Tool, type Units } from './src/tools';
 import { CardGrid, DuoPanes, bodyPad, headerPad, useDuo } from './src/duo';
+import AiAssist from './src/aiAssist';
 
 type Screen = { kind: 'list' } | { kind: 'tool'; id: string } | { kind: 'job' };
 
@@ -211,6 +212,7 @@ function ListScreen(props: {
   return (
     <View style={S.root}>
       <StatusBar style="dark" />
+      <AiAssist app="SiteMath" hint="Construction takeoff math: slope and grade, offsets, concrete and material quantities." gutter={duo.gutter} />
       <View style={[S.header, headerPad(duo)]}>
         <View style={S.headerRow}>
           <View style={{ flex: 1 }}>
