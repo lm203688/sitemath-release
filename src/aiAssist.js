@@ -57,6 +57,9 @@ export default function AiAssist(props) {
   const app = props && props.app ? props.app : 'this app';
   const hint = props && props.hint ? props.hint : '';
   const gutter = props && props.gutter ? props.gutter : 0;
+  // Apps with a pinned footer bar (job sheet, takeoff total) need to lift the button
+  // above it; everything else floats over the scroll content.
+  const bottom = props && props.bottom ? props.bottom : 28;
 
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
@@ -104,7 +107,7 @@ export default function AiAssist(props) {
           setOpen(true);
           setState(aiAvailability());
         }}
-        style={[styles.fab, !state.available && styles.fabDim]}
+        style={[styles.fab, { bottom }, !state.available && styles.fabDim]}
       >
         <Text style={styles.fabText}>AI</Text>
       </Pressable>
@@ -168,7 +171,6 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     left: 16,
-    bottom: 28,
     height: 44,
     minWidth: 44,
     paddingHorizontal: 14,
