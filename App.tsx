@@ -212,7 +212,7 @@ function ListScreen(props: {
   return (
     <View style={S.root}>
       <StatusBar style="dark" />
-      <AiAssist app="SiteMath" hint="Construction takeoff math: slope and grade, offsets, concrete and material quantities." gutter={duo.gutter} />
+      <AiAssist app="SiteMath" hint="Construction takeoff math: slope and grade, offsets, concrete and material quantities." gutter={duo.gutter} bottom={108} />
       <View style={[S.header, headerPad(duo)]}>
         <View style={S.headerRow}>
           <View style={{ flex: 1 }}>
