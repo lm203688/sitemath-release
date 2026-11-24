@@ -48,10 +48,11 @@
         "UIRequiredDeviceCapabilities": [
           "arm64"
         ]
-      }
+      },
+      "icon": "./assets/icon.png"
     },
     "plugins": [
-    "./plugins/withAppIntents.cjs",
+      "./plugins/withAppIntents.cjs",
       "./plugins/withUIScene.cjs",
       "expo-file-system"
     ],
@@ -60,6 +61,7 @@
       "eas": {
         "projectId": "55a441f7-4d2f-4ed5-a00d-4a8ebaaef9f6"
       }
-    }
+    },
+    "icon": "./assets/icon.png"
   }
 }
