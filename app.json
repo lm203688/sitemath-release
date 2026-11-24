@@ -11,7 +11,7 @@
       "bundleIdentifier": "com.lixing.sitemath",
       "supportsTablet": false,
       "deploymentTarget": "16.4",
-      "buildNumber": "5",
+      "buildNumber": "6",
       "config": {
         "usesNonExemptEncryption": false
       },
