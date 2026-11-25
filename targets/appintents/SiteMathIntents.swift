@@ -213,7 +213,7 @@ struct MaterialUnitsIntent: AppIntent {
       return .result(dialog: IntentDialog(stringLiteral: "Area has to be greater than zero."))
     }
     let raw = areaSquareFeet / material.squareFeetPerUnit
-    let units = Int((raw * 100).rounded(.up) / 100 == raw ? raw.rounded(.up) : raw.rounded(.up))
+    let units = Int(raw.rounded(.up))
     let text = "\(material.summary): about \(units) \(material.unitLabel) for \(Int(areaSquareFeet)) sq ft (one \(material.unitLabel) covers \(Int(material.squareFeetPerUnit) sq ft)."
     return .result(dialog: IntentDialog(stringLiteral: text))
   }
