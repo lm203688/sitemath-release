@@ -214,7 +214,7 @@ struct MaterialUnitsIntent: AppIntent {
     }
     let raw = areaSquareFeet / material.squareFeetPerUnit
     let units = Int(raw.rounded(.up))
-    let text = "\(material.summary): about \(units) \(material.unitLabel) for \(Int(areaSquareFeet)) sq ft (one \(material.unitLabel) covers \(Int(material.squareFeetPerUnit) sq ft)."
+    let text = "\(material.summary): about \(units) \(material.unitLabel) for \(Int(areaSquareFeet)) sq ft (one \(material.unitLabel) covers \(Int(material.squareFeetPerUnit)) sq ft)."
     return .result(dialog: IntentDialog(stringLiteral: text))
   }
 }
