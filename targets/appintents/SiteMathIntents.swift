@@ -148,3 +148,73 @@ struct SiteMathShortcuts: AppShortcutsProvider {
     )
   }
 }
+
+
+// MARK: - Material entity (Spotlight + Siri parameter)
+
+// 每种材料的"一单位铺多少平方英尺"是工地上真正要换算的那个数，写死在这里，
+// 意图就不依赖 app 里的报价库。
+@available(iOS 16.0, *)
+struct MaterialEntity: AppEntity {
+  static var typeDisplayRepresentation: TypeDisplayRepresentation = TypeDisplayRepresentation(name: "Material")
+  static var defaultQuery = MaterialQuery()
+
+  let id: String
+  let summary: String
+  /// Square feet covered by one purchase unit at the stated lift.
+  let squareFeetPerUnit: Double
+  /// Purchase unit, e.g. "cu yd" or "sq ft".
+  let unitLabel: String
+
+  var displayRepresentation: DisplayRepresentation {
+    DisplayRepresentation(title: "\(summary)", subtitle: "\(Int(squareFeetPerUnit)) sq ft per \(unitLabel)")
+  }
+
+  static let all: [MaterialEntity] = [
+    MaterialEntity(id: "concrete-4in", summary: "Concrete, 4 in slab", squareFeetPerUnit: 81, unitLabel: "cu yd"),
+    MaterialEntity(id: "gravel-2in", summary: "Gravel, 2 in lift", squareFeetPerUnit: 162, unitLabel: "cu yd"),
+    MaterialEntity(id: "sand-2in", summary: "Sand, 2 in lift", squareFeetPerUnit: 162, unitLabel: "cu yd"),
+    MaterialEntity(id: "mulch-3in", summary: "Mulch, 3 in", squareFeetPerUnit: 108, unitLabel: "cu yd"),
+    MaterialEntity(id: "sod", summary: "Sod", squareFeetPerUnit: 1, unitLabel: "sq ft"),
+  ]
+}
+
+@available(iOS 18.0, *)
+extension MaterialEntity: IndexedEntity {}
+
+@available(iOS 16.0, *)
+struct MaterialQuery: EntityQuery {
+  func entities(for identifiers: [String]) async throws -> [MaterialEntity] {
+    MaterialEntity.all.filter { identifiers.contains($0.id) }
+  }
+
+  func suggestedEntities() async throws -> [MaterialEntity] {
+    MaterialEntity.all
+  }
+
+  func defaultResult() async -> MaterialEntity? {
+    MaterialEntity.all.first
+  }
+}
+
+@available(iOS 16.0, *)
+struct MaterialUnitsIntent: AppIntent {
+  static var title: LocalizedStringResource = "Material units for an area"
+  static var description = IntentDescription("How many purchase units a given area needs, rounded up.")
+
+  @Parameter(title: "Material")
+  var material: MaterialEntity
+
+  @Parameter(title: "Area in square feet")
+  var areaSquareFeet: Double
+
+  func perform() async throws -> some IntentResult & ProvidesDialog {
+    guard areaSquareFeet > 0 else {
+      return .result(dialog: IntentDialog(stringLiteral: "Area has to be greater than zero."))
+    }
+    let raw = areaSquareFeet / material.squareFeetPerUnit
+    let units = Int((raw * 100).rounded(.up) / 100 == raw ? raw.rounded(.up) : raw.rounded(.up))
+    let text = "\(material.summary): about \(units) \(material.unitLabel) for \(Int(areaSquareFeet)) sq ft (one \(material.unitLabel) covers \(Int(material.squareFeetPerUnit) sq ft)."
+    return .result(dialog: IntentDialog(stringLiteral: text))
+  }
+}
