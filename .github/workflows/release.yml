@@ -1,4 +1,4 @@
-name: release
+﻿name: release
 
 on:
   workflow_dispatch:
@@ -140,6 +140,10 @@ jobs:
           sed -n '/UIApplicationSceneManifest/,+12p' "$RUNNER_TEMP/plist.txt"
           grep -n "class SceneDelegate" ios/*/AppDelegate.swift || { echo "FAIL: SceneDelegate missing"; exit 1; }
           echo "OK: signed ipa adopts UIScene lifecycle"
+          echo "== app intents gate =="
+          test -d "$APP/Metadata.appintents" || { echo "FAIL: App Intents metadata missing from signed ipa"; exit 1; }
+          grep -raq "SiteMathShortcuts" "$APP/Metadata.appintents" || { echo "FAIL: SiteMathShortcuts not registered in intent metadata"; exit 1; }
+          echo "OK: App Intents shortcuts registered"
 
       - name: Upload to App Store Connect
         if: ${{ inputs.upload }}
